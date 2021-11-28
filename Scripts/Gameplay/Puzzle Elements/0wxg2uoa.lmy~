@@ -1,0 +1,33 @@
+using System.Collections;
+using UnityEngine.UI;
+using UnityEngine;
+
+namespace ANormalGame.Gameplay.PuzzleElements
+{
+    public class ChargedDoor : Door
+    {
+        public Slider ChargeMeter;
+        public float MaxChargeValue;
+        [HideInInspector]
+        public bool IsCharging;
+
+        void Update()
+        {
+            ChargeMeter.value += (IsCharging) ? Time.deltaTime : -Time.deltaTime;
+
+            if(ChargeMeter.value < 0.1f && IsOpen)
+            {
+                SetOpen(false);
+            }
+            else if(ChargeMeter.value > MaxChargeValue - 0.1f && !IsOpen)
+            {
+                SetOpen(true);
+            }
+        }
+
+        public void SetCharging(bool Value)
+        {
+            IsCharging = Value;
+        }
+    }
+}

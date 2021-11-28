@@ -1,0 +1,66 @@
+using System.Collections;
+using TMPro;
+using UnityEngine;
+
+public class TV : MonoBehaviour
+{
+    [HideInInspector]
+    public bool IsPlayed;
+    public float DetectionRadius;
+    public float InitialDelay;
+    [System.Serializable]
+    public class Sentence
+    {
+        public string Text;
+        public float NextDelay;
+    }
+    public Sentence[] Sentences;
+    public float CharDelay;
+    TMP_Text TextDisplay;
+    Transform Player;
+    public MeshRenderer screen;
+    Material Mat;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        Player = GameObject.FindGameObjectWithTag("Player").transform;
+        Mat = new Material(screen.material);
+        Mat.name = "Screen Mat_" + GetHashCode();
+        screen.material = Mat;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(Vector3.Distance(transform.position, Player.position) < DetectionRadius && !IsPlayed)
+        {
+            Play();
+        }
+    }
+
+    void Play()
+    {
+        IsPlayed = true;
+        Mat.color = Color.white;
+        StartCoroutine(play());
+    }
+    IEnumerator play()
+    {
+        TextDisplay.text = "";
+        yield return new WaitForSeconds(InitialDelay);
+
+        for (int S = 0; S < Sentences.Length; S++)
+        {
+            TextDisplay.text = "";
+            char[] Chars = Sentences[S].Text.ToCharArray();
+            foreach (char C in Chars)
+            {
+                TextDisplay.text += C;
+                yield return new WaitForSeconds(CharDelay);
+            }
+
+            yield return new WaitForSeconds(Sentences[S].NextDelay);
+        }
+    }
+}

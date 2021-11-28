@@ -1,0 +1,58 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Pickupper : MonoBehaviour
+{
+    public float MaxDist;
+    public float SmoothSpeed;
+    bool IsHit;
+    RaycastHit hit;
+    Pickuppuble CurPicked;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        CurPicked = null;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        IsHit = Physics.Raycast(ray, out hit, MaxDist);
+
+        if(CurPicked != null)
+        {
+            Vector3 Pos = (IsHit) ? hit.point : transform.position + (transform.forward * MaxDist);
+            Vector3 Gap = Pos - (CurPicked.Body.position);
+            CurPicked.Body.AddForce(((Gap * Gap.sqrMagnitude) + -CurPicked.Body.velocity) * SmoothSpeed);
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            TryPickup();
+        }
+        else if(Input.GetMouseButtonUp(0))
+        {
+            Release();
+        }
+    }
+
+    void TryPickup()
+    {
+        Pickuppuble pickuppuble = hit.collider.GetComponent<Pickuppuble>();
+        if(pickuppuble != null)
+        {
+            pickuppuble.IsPicked = true;
+            /// pickuppuble.SetVelTo0();
+            CurPicked = pickuppuble;
+        }
+    }
+    void Release()
+    {
+        CurPicked.IsPicked = false;
+        // CurPicked.ResetVel();
+        CurPicked = null;
+    }
+}
